@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Beautiful Report</title>
+  <title>Gabriella Lai's portfolio for MA Design for Change, Edinburgh College of Art</title>
 
   <!-- PDF.js from official CDN (no download needed) -->
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs" type="module"></script>
@@ -34,7 +34,7 @@
 
   <script type="module">
     // Change this if your PDF has a different name
-    const pdfUrl = 'ECA_Gabriellai_portfolio.pdf';
+    const pdfUrl = 'ecadoc/portfolio.pdf';
 
     const { pdfjsLib } = globalThis;
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs';
@@ -71,7 +71,7 @@
       document.getElementById('viewer').innerHTML =
         `<div style="color:red; text-align:center; padding:50px;">
            Error loading PDF: ${err.message}<br><br>
-           Make sure your PDF is named <strong>report.pdf</strong> and uploaded!
+           Make sure your PDF is named <strong>portfolio.pdf</strong> and uploaded!
          </div>`;
     });
   </script>
