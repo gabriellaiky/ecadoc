@@ -1,57 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gabriella Lai's portfolio for MA Design for Change, Edinburgh College of Art</title>
 
-  <!-- PDF.js from official CDN (no download needed) -->
+  <!-- PDF.js from CDN (latest stable version) -->
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs" type="module"></script>
 
   <style>
-    body { margin: 0; background: #1a1a1a; display: flex; justify-content: center; padding: 20px 0; }
+    body {
+      margin: 0;
+      background: #0f0f0f;
+      display: flex;
+      justify-content: center;
+      padding: 30px 10px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
     #viewer {
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      max-width: 900px;
+      max-width: 960px;
       width: 100%;
     }
     .page {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       background: white;
-      display: block;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      border-radius: 4px;
+      border-radius: 8px;
       overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    canvas { display: block; width: 100%; height: auto; }
-    .loading { text-align: center; color: #aaa; font-family: Arial; padding: 40px; }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .loading {
+      text-align: center;
+      color: #888;
+      font-size: 18px;
+      padding: 80px 20px;
+    }
   </style>
 </head>
 <body>
+
   <div id="viewer">
-    <div class="loading">Gabriella Lai's portfolio for MA Design for Change, Edinburgh College of Art</div>
+    <div class="loading">Loading your portfolio…</div>
   </div>
 
   <script type="module">
-    // Change this if your PDF has a different name
-    const pdfUrl = 'ecadoc/portfolio.pdf';
+    // ←←← ONLY THIS LINE CHANGED ←←←
+    const pdfUrl = 'portfolio.pdf';   // ← your exact file name
 
     const { pdfjsLib } = globalThis;
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs';
+
+    // Tell PDF.js where to find its worker (required!)
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs';
 
     const loadingTask = pdfjsLib.getDocument(pdfUrl);
+
     loadingTask.promise.then(pdf => {
       const viewer = document.getElementById('viewer');
-      viewer.innerHTML = ''; // remove loading message
+      viewer.innerHTML = ''; // remove loading text
 
+      // Loop through every page
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         pdf.getPage(pageNum).then(page => {
-          const scale = 1.5;
+          const scale = 1.8; // a bit bigger = sharper on retina screens
           const viewport = page.getViewport({ scale });
 
+          // Create container for this page
           const pageDiv = document.createElement('div');
           pageDiv.className = 'page';
 
+          // Create canvas and render the page into it
           const canvas = document.createElement('canvas');
           const context = canvas.getContext('2d');
           canvas.height = viewport.height;
@@ -60,20 +82,22 @@
           pageDiv.appendChild(canvas);
           viewer.appendChild(pageDiv);
 
-          const renderContext = {
+          // Actually draw the page
+          page.render({
             canvasContext: context,
             viewport: viewport
-          };
-          page.render(renderContext);
+          });
         });
       }
-    }).catch(err => {
-      document.getElementById('viewer').innerHTML =
-        `<div style="color:red; text-align:center; padding:50px;">
-           Error loading PDF: ${err.message}<br><br>
-           Make sure your PDF is named <strong>portfolio.pdf</strong> and uploaded!
-         </div>`;
+    }).catch(error => {
+      document.getElementById('viewer').innerHTML = `
+        <div style="color:#ff5555; text-align:center; padding:80px; font-size:20px;">
+          Could not load portfolio.pdf<br><br>
+          Make sure the file is named exactly <strong>portfolio.pdf</strong><br>
+          and is in the same folder as index.html
+        </div>`;
     });
   </script>
+
 </body>
 </html>
