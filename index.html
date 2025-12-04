@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Beautiful Report</title>
+
+  <!-- PDF.js from official CDN (no download needed) -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs" type="module"></script>
+
+  <style>
+    body { margin: 0; background: #1a1a1a; display: flex; justify-content: center; padding: 20px 0; }
+    #viewer {
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      max-width: 900px;
+      width: 100%;
+    }
+    .page {
+      margin-bottom: 20px;
+      background: white;
+      display: block;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    canvas { display: block; width: 100%; height: auto; }
+    .loading { text-align: center; color: #aaa; font-family: Arial; padding: 40px; }
+  </style>
+</head>
+<body>
+  <div id="viewer">
+    <div class="loading">Gabriella Lai's portfolio for MA Design for Change, Edinburgh College of Art</div>
+  </div>
+
+  <script type="module">
+    // Change this if your PDF has a different name
+    const pdfUrl = 'ECA_Gabriellai_portfolio.pdf';
+
+    const { pdfjsLib } = globalThis;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs';
+
+    const loadingTask = pdfjsLib.getDocument(pdfUrl);
+    loadingTask.promise.then(pdf => {
+      const viewer = document.getElementById('viewer');
+      viewer.innerHTML = ''; // remove loading message
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        pdf.getPage(pageNum).then(page => {
+          const scale = 1.5;
+          const viewport = page.getViewport({ scale });
+
+          const pageDiv = document.createElement('div');
+          pageDiv.className = 'page';
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          pageDiv.appendChild(canvas);
+          viewer.appendChild(pageDiv);
+
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          page.render(renderContext);
+        });
+      }
+    }).catch(err => {
+      document.getElementById('viewer').innerHTML =
+        `<div style="color:red; text-align:center; padding:50px;">
+           Error loading PDF: ${err.message}<br><br>
+           Make sure your PDF is named <strong>report.pdf</strong> and uploaded!
+         </div>`;
+    });
+  </script>
+</body>
+</html>
